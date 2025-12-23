@@ -148,7 +148,7 @@ const studyGroups = {
         {
             name: "The Motion Frogs",
             leader: "Conso",
-            members: ["Conso", "Daniel Mkama", "Dizzo", "Issack", "Steve", "Basheik", "Somebody Paul"],
+            members: ["Conso", "Daniel Mkama", "Dizzo", "Issack", "Steve", "Basheik", "Peter Paul"],
             meetingTime: "Flex",
             location: "Flex"
         },
