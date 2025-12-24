@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-    }, 30000);
+    }, 1000);
     
     // Load courses
     loadCourses();

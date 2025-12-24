@@ -2107,6 +2107,15 @@ body {
     padding: 25px 30px;
 }
 
+/*Two pics layout */
+.profile-pics {
+    padding: 5px 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap; /* Ensures items stay in a single line */
+}
+
 /* Profile Image Container */
 .profile-container {
     position: relative;
