@@ -53,15 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
     }, 1000);
     
-    // Show birthday modal after 1 second (immediately)
+    // Show birthday modal after 30 seconds
     setTimeout(() => {
         if (birthdayModal) {
             birthdayModal.style.display = 'flex';
-            
-            // Start playing video with audio
-            setTimeout(() => {
-                playBirthdayVideoWithAudio();
-            }, 300); // Small delay to ensure modal is fully loaded
             
             // Set timeout to close birthday popup after 30 seconds
             birthdayTimeout = setTimeout(closeBirthdayPopup, 30000);
@@ -73,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-    }, 10000);
+    }, 15000);
     
     // Load courses
     loadCourses();
@@ -86,70 +81,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up event listeners
     setupEventListeners();
+    
+    // Initialize birthday video
+    setupBirthdayVideo();
 });
-
-// Function to play birthday video with audio
-function playBirthdayVideoWithAudio() {
-    const birthdayVideo = document.querySelector('.birthday-video');
-    if (!birthdayVideo) return;
-    
-    // Try to play with audio
-    const playPromise = birthdayVideo.play();
-    
-    if (playPromise !== undefined) {
-        playPromise.then(() => {
-            // Audio playback started successfully
-            birthdayVideo.muted = false;
-            birthdayVideo.volume = 0.5; // Set to 50% volume
-            
-            // Update UI indicators
-            const mutedIndicator = document.querySelector('.muted-indicator');
-            if (mutedIndicator) {
-                mutedIndicator.innerHTML = '<i class="fas fa-volume-up"></i>';
-                mutedIndicator.title = 'Video is playing with audio - click to mute';
-            }
-            
-            // Hide unmute button since audio is already playing
-            const unmuteBtn = document.querySelector('.unmute-btn');
-            if (unmuteBtn) {
-                unmuteBtn.style.display = 'none';
-            }
-            
-            showNotification("🎵 Birthday video is playing with audio!");
-        }).catch(error => {
-            // Auto-play with audio was blocked, fallback to muted
-            console.log("Auto-play with audio blocked, falling back to muted:", error);
-            birthdayVideo.muted = true;
-            birthdayVideo.play();
-            
-            // Show unmute button for user interaction
-            const unmuteBtn = document.querySelector('.unmute-btn');
-            if (unmuteBtn) {
-                unmuteBtn.style.display = 'inline-flex';
-            }
-            
-            showNotification("🔇 Click unmute to hear birthday message!");
-        });
-    }
-}
-
-// Function to stop birthday video
-function stopBirthdayVideo() {
-    const birthdayVideo = document.querySelector('.birthday-video');
-    if (birthdayVideo) {
-        // Pause the video
-        birthdayVideo.pause();
-        
-        // Reset to beginning
-        birthdayVideo.currentTime = 0;
-        
-        // Mute the audio
-        birthdayVideo.muted = true;
-        
-        // Reset volume
-        birthdayVideo.volume = 0.5;
-    }
-}
 
 // Function to close popup
 function closePopup() {
@@ -179,6 +114,15 @@ function closeStudyGroupsModal() {
     }, 500);
 }
 
+// Function to stop birthday video
+function stopBirthdayVideo() {
+    const birthdayVideo = document.querySelector('.birthday-video');
+    if (birthdayVideo) {
+        birthdayVideo.pause();
+        birthdayVideo.currentTime = 0;
+    }
+}
+
 // Function to close birthday popup
 function closeBirthdayPopup() {
     // Clear the timeout if it exists
@@ -186,22 +130,28 @@ function closeBirthdayPopup() {
         clearTimeout(birthdayTimeout);
     }
     
-    // Stop and mute the video
+    // Stop and reset the video
     stopBirthdayVideo();
     
-    // Reset UI indicators
-    const mutedIndicator = document.querySelector('.muted-indicator');
-    if (mutedIndicator) {
-        mutedIndicator.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        mutedIndicator.title = 'Video is muted';
-    }
-    
-    // Reset unmute button
-    const unmuteBtn = document.querySelector('.unmute-btn');
-    if (unmuteBtn) {
-        unmuteBtn.style.display = 'inline-flex';
-        unmuteBtn.style.opacity = '1';
-        unmuteBtn.disabled = false;
+    // Reset video controls
+    const birthdayVideo = document.querySelector('.birthday-video');
+    if (birthdayVideo) {
+        birthdayVideo.muted = true;
+        
+        // Reset muted indicator
+        const mutedIndicator = document.querySelector('.muted-indicator');
+        if (mutedIndicator) {
+            mutedIndicator.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            mutedIndicator.title = 'Video is muted - click to unmute';
+        }
+        
+        // Reset unmute button
+        const unmuteBtn = document.querySelector('.unmute-btn');
+        if (unmuteBtn) {
+            unmuteBtn.style.display = 'inline-flex';
+            unmuteBtn.style.opacity = '1';
+            unmuteBtn.disabled = false;
+        }
     }
     
     // Add fade out animation
@@ -267,63 +217,12 @@ function setupEventListeners() {
         birthdayCloseBtn.addEventListener('click', closeBirthdayPopup);
     }
     
-    // Muted indicator click handler
-    const mutedIndicator = document.querySelector('.muted-indicator');
-    if (mutedIndicator) {
-        mutedIndicator.addEventListener('click', function() {
-            const birthdayVideo = document.querySelector('.birthday-video');
-            if (!birthdayVideo) return;
-            
-            birthdayVideo.muted = !birthdayVideo.muted;
-            
-            if (birthdayVideo.muted) {
-                this.innerHTML = '<i class="fas fa-volume-mute"></i>';
-                this.title = 'Video is muted - click to unmute';
-                showNotification("🔇 Sound muted");
-            } else {
-                this.innerHTML = '<i class="fas fa-volume-up"></i>';
-                this.title = 'Video is unmuted - click to mute';
-                showNotification("🔊 Sound unmuted!");
-                
-                // If video was paused, play it
-                if (birthdayVideo.paused) {
-                    birthdayVideo.play();
-                }
-            }
-        });
-    }
-    
-    // Unmute button functionality
+    // Also stop video when clicking the unmute prompt close
     const unmuteBtn = document.querySelector('.unmute-btn');
     if (unmuteBtn) {
         unmuteBtn.addEventListener('click', function() {
-            const birthdayVideo = document.querySelector('.birthday-video');
-            if (!birthdayVideo) return;
-            
-            // Unmute and play with audio
-            birthdayVideo.muted = false;
-            
-            // Try to play if paused
-            if (birthdayVideo.paused) {
-                birthdayVideo.play();
-            }
-            
-            // Update UI
-            const mutedIndicator = document.querySelector('.muted-indicator');
-            if (mutedIndicator) {
-                mutedIndicator.innerHTML = '<i class="fas fa-volume-up"></i>';
-                mutedIndicator.title = 'Video is unmuted - click to mute';
-            }
-            
-            showNotification("🔊 Birthday message sound enabled! 🎵");
-            this.style.opacity = '0.5';
-            this.style.cursor = 'default';
-            this.disabled = true;
-            
-            // Remove button after 3 seconds
-            setTimeout(() => {
-                this.style.display = 'none';
-            }, 3000);
+            // After unmuting, also make clicking this button close the modal
+            this.addEventListener('click', closeBirthdayPopup, { once: true });
         });
     }
     
@@ -331,11 +230,6 @@ function setupEventListeners() {
     studyGroupsBtn.addEventListener('click', function() {
         studyGroupsModal.style.display = 'flex';
         studyGroupsModal.style.animation = 'modalAppear 0.5s ease-out';
-        
-        // Stop birthday video if playing
-        if (birthdayModal && birthdayModal.style.display === 'flex') {
-            stopBirthdayVideo();
-        }
     });
     
     // Close study groups modal
@@ -484,61 +378,8 @@ function setupEventListeners() {
             if (birthdayVideo && !birthdayVideo.paused) {
                 birthdayVideo.pause();
             }
-        } else {
-            // Resume video when tab becomes visible again (only if modal is open)
-            if (birthdayModal && birthdayModal.style.display === 'flex') {
-                const birthdayVideo = document.querySelector('.birthday-video');
-                if (birthdayVideo && birthdayVideo.paused) {
-                    birthdayVideo.play().catch(e => console.log("Could not resume video:", e));
-                }
-            }
         }
     });
-    
-    // Handle video errors
-    const birthdayVideo = document.querySelector('.birthday-video');
-    if (birthdayVideo) {
-        birthdayVideo.addEventListener('error', function() {
-            console.error("Video error:", this.error);
-            showNotification("⚠️ Could not load birthday video");
-            
-            // Show fallback image
-            const videoWrapper = document.querySelector('.video-wrapper');
-            if (videoWrapper && this.poster) {
-                videoWrapper.innerHTML = `
-                    <div class="video-error-fallback">
-                        <img src="${this.poster}" 
-                             alt="Santa Claus" 
-                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center;">
-                            <p style="background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 10px; font-size: 12px;">
-                                <i class="fas fa-gift"></i> Happy Birthday!
-                            </p>
-                        </div>
-                    </div>
-                `;
-            }
-        });
-        
-        // Show loading state
-        birthdayVideo.addEventListener('waiting', function() {
-            const videoWrapper = this.parentElement;
-            if (videoWrapper && !videoWrapper.querySelector('.video-loading')) {
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'video-loading';
-                loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                videoWrapper.appendChild(loadingDiv);
-            }
-        });
-        
-        // Hide loading state
-        birthdayVideo.addEventListener('playing', function() {
-            const loading = this.parentElement.querySelector('.video-loading');
-            if (loading) {
-                loading.remove();
-            }
-        });
-    }
 }
 
 // Opening google forms
@@ -557,6 +398,96 @@ function openGoogleForm(formKey, eventName) {
     
     // Open Google Form in new tab
     window.open(formUrl, '_blank', 'noopener,noreferrer');
+}
+
+// ========== BIRTHDAY VIDEO CONTROLS ==========
+function setupBirthdayVideo() {
+    const video = document.querySelector('.birthday-video');
+    const mutedIndicator = document.querySelector('.muted-indicator');
+    const unmuteBtn = document.querySelector('.unmute-btn');
+    
+    if (!video) return;
+    
+    // Ensure video is muted for autoplay (browser requirement)
+    video.muted = true;
+    
+    // Click on muted indicator to unmute
+    if (mutedIndicator) {
+        mutedIndicator.addEventListener('click', function() {
+            video.muted = !video.muted;
+            this.innerHTML = video.muted ? 
+                '<i class="fas fa-volume-mute"></i>' : 
+                '<i class="fas fa-volume-up"></i>';
+            this.title = video.muted ? 
+                'Video is muted - click to unmute' : 
+                'Video is unmuted - click to mute';
+            
+            if (!video.muted) {
+                showNotification("Sound unmuted! 🔊");
+            }
+        });
+    }
+    
+    // Unmute button functionality
+    if (unmuteBtn) {
+        unmuteBtn.addEventListener('click', function() {
+            video.muted = false;
+            if (mutedIndicator) {
+                mutedIndicator.innerHTML = '<i class="fas fa-volume-up"></i>';
+                mutedIndicator.title = 'Video is unmuted - click to mute';
+            }
+            showNotification("Birthday message sound enabled! 🎵");
+            this.style.opacity = '0.5';
+            this.style.cursor = 'default';
+            this.disabled = true;
+            
+            // Remove button after 3 seconds
+            setTimeout(() => {
+                this.style.display = 'none';
+            }, 3000);
+        });
+    }
+    
+    // Handle video errors
+    video.addEventListener('error', function() {
+        console.error("Video error:", video.error);
+        
+        // Show fallback image
+        const videoWrapper = document.querySelector('.video-wrapper');
+        if (videoWrapper && video.poster) {
+            videoWrapper.innerHTML = `
+                <div class="video-error-fallback">
+                    <img src="${video.poster}" 
+                         alt="Santa Claus" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center;">
+                        <p style="background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 10px; font-size: 12px;">
+                            <i class="fas fa-gift"></i> Happy Birthday!
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    // Show loading state
+    video.addEventListener('waiting', function() {
+        const videoWrapper = this.parentElement;
+        if (videoWrapper && !videoWrapper.querySelector('.video-loading')) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'video-loading';
+            loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            videoWrapper.appendChild(loadingDiv);
+        }
+    });
+    
+    // Hide loading state
+    video.addEventListener('playing', function() {
+        const loading = this.parentElement.querySelector('.video-loading');
+        if (loading) {
+            loading.remove();
+        }
+    });
 }
 
 // Load courses to the homepage
