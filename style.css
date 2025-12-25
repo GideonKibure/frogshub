@@ -2491,3 +2491,337 @@ body {
         display: none !important;
     }
 }
+
+/* ========== CIRCULAR VIDEO PLAYER ========== */
+
+.video-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 25px;
+}
+
+.video-frame {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+    padding: 8px;
+    box-shadow: 0 15px 35px rgba(30, 144, 255, 0.25);
+    animation: pulse 2s infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 15px 35px rgba(30, 144, 255, 0.25);
+    }
+    50% {
+        box-shadow: 0 20px 45px rgba(30, 144, 255, 0.4);
+    }
+}
+
+.video-wrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    background: #000;
+}
+
+.birthday-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: transform 0.8s ease, filter 0.5s ease;
+    filter: brightness(1.05) contrast(1.1);
+}
+
+.video-wrapper:hover .birthday-video {
+    transform: scale(1.08);
+    filter: brightness(1.1) contrast(1.15);
+}
+
+/* Subtle muted indicator */
+.muted-indicator {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    z-index: 5;
+}
+
+.muted-indicator:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+/* Name Badge */
+.video-container .name-badge {
+    position: absolute;
+    bottom: -15px;
+    right: -10px;
+    background: linear-gradient(135deg, #06D6A0 0%, #0ACF83 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 8px 25px rgba(6, 214, 160, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    border: 2px solid white;
+    animation: float 3s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.video-container .name-badge i {
+    font-size: 14px;
+    animation: crownShine 2s infinite;
+}
+
+@keyframes crownShine {
+    0%, 100% {
+        transform: rotate(0deg);
+        color: #FFD166;
+    }
+    25% {
+        transform: rotate(15deg);
+        color: #FFB347;
+    }
+    75% {
+        transform: rotate(-15deg);
+        color: #FFD166;
+    }
+}
+
+/* Unmute Prompt */
+.unmute-prompt {
+    position: absolute;
+    bottom: -70px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    opacity: 0;
+    animation: fadeInUp 0.5s ease 2s forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        bottom: -40px;
+    }
+}
+
+.unmute-btn {
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.9) 0%, rgba(0, 191, 255, 0.9) 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.unmute-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(30, 144, 255, 0.3);
+    background: linear-gradient(135deg, rgba(30, 144, 255, 1) 0%, rgba(0, 191, 255, 1) 100%);
+}
+
+.unmute-btn i {
+    font-size: 11px;
+}
+
+/* Video Loading State */
+.video-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #1e90ff 25%, #00bfff 50%, #1e90ff 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    z-index: 2;
+}
+
+@keyframes loading {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Video Error Fallback */
+.video-error-fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    z-index: 2;
+}
+
+.video-error-fallback i {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #FFD166;
+}
+
+.video-error-fallback p {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+/* Decorative Ring Animation */
+.video-frame::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #1e90ff, #00bfff, #06D6A0, #1e90ff);
+    background-size: 400% 400%;
+    z-index: -1;
+    animation: gradientRing 4s ease infinite;
+    opacity: 0.5;
+}
+
+@keyframes gradientRing {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .video-container {
+        width: 170px;
+        height: 170px;
+    }
+    
+    .video-container .name-badge {
+        padding: 8px 16px;
+        font-size: 14px;
+        bottom: -12px;
+        right: -8px;
+    }
+    
+    .muted-indicator {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .video-container {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .video-container .name-badge {
+        padding: 7px 14px;
+        font-size: 13px;
+        bottom: -10px;
+        right: -6px;
+    }
+    
+    .unmute-btn {
+        padding: 7px 14px;
+        font-size: 11px;
+    }
+    
+    .unmute-prompt {
+        bottom: -45px;
+    }
+}
+
+/* Add subtle rotation on hover */
+.video-wrapper {
+    transition: transform 0.8s ease;
+}
+
+.video-wrapper:hover {
+    transform: rotate(5deg);
+}
+
+/* Hide default video controls */
+.birthday-video::-webkit-media-controls {
+    display: none !important;
+}
+
+.birthday-video::-webkit-media-controls-panel {
+    display: none !important;
+}
+
+.birthday-video::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+.birthday-video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+}
+
+.birthday-video {
+    -webkit-media-controls: none;
+    -moz-media-controls: none;
+    -ms-media-controls: none;
+    media-controls: none;
+}

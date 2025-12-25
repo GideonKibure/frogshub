@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-    }, 15000);
+    }, 1000);
     
     // Load courses
     loadCourses();
@@ -1014,3 +1014,99 @@ function showNotification(message) {
         }
     }, 3000);
 }
+
+// ========== VIDEO UNMUTE FUNCTIONALITY ==========
+
+function setupBirthdayVideo() {
+    const video = document.querySelector('.birthday-video');
+    const mutedIndicator = document.querySelector('.muted-indicator');
+    const unmuteBtn = document.querySelector('.unmute-btn');
+    
+    if (!video) return;
+    
+    // Ensure video is muted for autoplay (browser requirement)
+    video.muted = true;
+    
+    // Click on muted indicator to unmute
+    if (mutedIndicator) {
+        mutedIndicator.addEventListener('click', function() {
+            video.muted = !video.muted;
+            this.innerHTML = video.muted ? 
+                '<i class="fas fa-volume-mute"></i>' : 
+                '<i class="fas fa-volume-up"></i>';
+            this.title = video.muted ? 
+                'Video is muted - click to unmute' : 
+                'Video is unmuted - click to mute';
+            
+            if (!video.muted) {
+                showNotification("Sound unmuted! 🔊");
+            }
+        });
+    }
+    
+    // Unmute button functionality
+    if (unmuteBtn) {
+        unmuteBtn.addEventListener('click', function() {
+            video.muted = false;
+            if (mutedIndicator) {
+                mutedIndicator.innerHTML = '<i class="fas fa-volume-up"></i>';
+                mutedIndicator.title = 'Video is unmuted - click to mute';
+            }
+            showNotification("Birthday message sound enabled! 🎵");
+            this.style.opacity = '0.5';
+            this.style.cursor = 'default';
+            this.disabled = true;
+            
+            // Remove button after 3 seconds
+            setTimeout(() => {
+                this.style.display = 'none';
+            }, 3000);
+        });
+    }
+    
+    // Handle video errors
+    video.addEventListener('error', function() {
+        console.error("Video error:", video.error);
+        
+        // Show fallback image
+        const videoWrapper = document.querySelector('.video-wrapper');
+        if (videoWrapper && video.poster) {
+            videoWrapper.innerHTML = `
+                <div class="video-error-fallback">
+                    <img src="${video.poster}" 
+                         alt="Santa Claus" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center;">
+                        <p style="background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 10px; font-size: 12px;">
+                            <i class="fas fa-gift"></i> Happy Birthday!
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    // Show loading state
+    video.addEventListener('waiting', function() {
+        const videoWrapper = this.parentElement;
+        if (videoWrapper && !videoWrapper.querySelector('.video-loading')) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'video-loading';
+            loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            videoWrapper.appendChild(loadingDiv);
+        }
+    });
+    
+    // Hide loading state
+    video.addEventListener('playing', function() {
+        const loading = this.parentElement.querySelector('.video-loading');
+        if (loading) {
+            loading.remove();
+        }
+    });
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    setupBirthdayVideo();
+});
