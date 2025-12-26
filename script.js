@@ -23,7 +23,7 @@ const resourcesGrid = document.getElementById('resourcesGrid');
 const eventRsvpBtn = document.querySelector('.event-rsvp');
 const attendEventBtn = document.querySelector('.btn-attend');
 const interestButtons = document.querySelectorAll('.event-interest');
-const birthdayModal = document.getElementById('birthdayModal'); // birthday modal
+const birthdayModal = document.getElementById('birthdayModa'); // birthday modal
 
 // Global variables
 let popupTimeout;
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-    }, 15000);
+    }, 1000);
     
     // Load courses
     loadCourses();
